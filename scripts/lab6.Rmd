@@ -1,0 +1,63 @@
+---
+title: "lab6"
+author: "Kyle Reardon"
+date: "10/27/2019"
+output: 
+  html_document:
+    highlight: pygments
+  pdf_document:
+    highlight: kate
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.width = 6.5,
+                      fig.height = 8)
+```
+
+## R Markdown
+
+The dataset appears to have 8 different selections for race/ethnicity, so I am not sure how to limit to just the four options in the PDF plot without knowing how each option is coded.
+
+```{r load-data, echo = FALSE}
+
+library(tidyverse)
+library(here)
+library(rio)
+library(janitor)
+library(tinytex)
+
+eclsk <- import(here("data", "ecls-k_samp.sav")) %>% 
+  characterize() %>% 
+  clean_names()
+
+unique(eclsk$ethnic)
+
+eclsk %>% 
+  filter(ethnic == "WHITE, NON-HISPANIC" | ethnic == "BLACK OR AFRICAN AMERICAN, NON-HISPANIC" | ethnic == "HISPANIC, RACE SPECIFIED" | ethnic == "HISPANIC, RACE NOT SPECIFIED") %>% 
+  ggplot(aes(t1mscale, t2mscale)) +
+  geom_point() +
+  geom_smooth(aes(color = school_type), method = lm) +
+  facet_wrap(~ethnic)
+
+```
+
+## Questions 4 and 5
+
+```{r}
+t1mean <- mean(eclsk$T1MSCALE, na.rm = TRUE)
+t1sd <- sd(eclsk$T1MSCALE, na.rm = TRUE)
+
+t2mean <- mean(eclsk$T2MSCALE, na.rm = TRUE)
+t2sd <- sd(eclsk$T2MSCALE, na.rm = TRUE)
+
+
+```
+
+For time one, the mean is `r t1mean` and the standard deviation is `r t1sd`. For time two, the mean is `r t2mean` and the standard devisation is `r t2sd`. The average gain is `r t2mean - t1mean`.
+
+## Reading in data
+
+The most efficient way to load data is using the rio and here packages. Using the here package loads data from the working directory. This ensures that R is pulling from the right source throughout your code as opposed to having to specify each time.
